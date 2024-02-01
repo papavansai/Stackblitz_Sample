@@ -15,5 +15,7 @@
   
   .input-container {
     padding: 10px;
-    
+  }
+  input{
+    flex: auto;
   }

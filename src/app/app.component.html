@@ -6,6 +6,9 @@
         <div id="map" ></div>
     </div>
     <div class="input-container">
-        <input type="text">
+        <input type="text" [(ngModel)]="display_name" placeholder="Location">
     </div>
+    <div *ngIf="data">
+        <p>{{ data.display_name }}</p>
+      </div>
   </div>

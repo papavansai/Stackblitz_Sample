@@ -1,4 +1,3 @@
-import { compileFactoryFunction } from '@angular/compiler';
 import { Component, OnInit } from '@angular/core';
 import { LayerGroup, Map, Marker, TileLayer, } from 'leaflet';
 
@@ -27,6 +26,8 @@ export class AppComponent implements OnInit {
   fullScreenOption: FullscreenOptions | any;
   lat = 17.4065;
   lng = 78.4772;
+  data: any;
+  display_name: any;
 
   constructor(){}
   
@@ -37,6 +38,7 @@ export class AppComponent implements OnInit {
          maxZoom: 19,
          attribution: '&copy'
        }).addTo(this.map);
+
     this.marker = new Marker([this.lat, this.lng], {draggable: true}).addTo(this.markers).addTo(this.map);
     this.marker.on('dragend', (event: any) => this.onMarkerDragEnd(event));
 
@@ -76,6 +78,8 @@ export class AppComponent implements OnInit {
     .then(response => response.json())
     .then(data => {
       console.log(data);
+      this.data = data;
+      this.display_name = data.display_name
     })
     .catch(error => {
       console.error("Error in reverse geocoding", error.message);
