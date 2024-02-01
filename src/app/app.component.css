@@ -2,3 +2,18 @@
     height: 300px;
     width: 400px;
 }
+
+.container {
+    display: flex;
+  }
+
+  .content {
+    flex: 0; /* The div will take up the available space */
+    padding: 10px;
+    border: 1px solid #ccc;
+  }
+  
+  .input-container {
+    padding: 10px;
+    
+  }
