@@ -64,7 +64,7 @@ export class AppComponent implements OnInit {
 
   addMarker(lat: any, lng: any){
     this.markers.clearLayers();
-    this.marker = new Marker([lat,lng],{draggable: true}).addTo(this.markers).addTo(this.map);
+    this.marker = new Marker([lat,lng],{icon: this.icon, draggable: true}).addTo(this.markers).addTo(this.map);
     this.marker.bindPopup('latitude: '+lat+'<br> longitude: '+lng ).openPopup();
     this.map.setView([lat,lng],13);
     this.marker.on('dragend', (event: any) => this.onMarkerDragEnd(event));
