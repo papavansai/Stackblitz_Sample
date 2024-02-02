@@ -29,6 +29,14 @@ export class AppComponent implements OnInit {
   lng = 78.4772;
   data: any;
   display_name: any;
+  icon = L.icon({
+    iconSize: [25, 41],
+   iconAnchor: [10, 41],
+   popupAnchor: [2, -40],
+   iconUrl: "https://unpkg.com/leaflet@1.5.1/dist/images/marker-icon.png",
+   shadowUrl:
+     "https://unpkg.com/leaflet@1.5.1/dist/images/marker-shadow.png"
+ });
 
   constructor(){}
   
@@ -37,10 +45,10 @@ export class AppComponent implements OnInit {
     this.markers = new LayerGroup().addTo(this.map);
     this.baseLayer = new TileLayer('http://tile.openstreetmap.org/{z}/{x}/{y}.png',{
          maxZoom: 19,
-         attribution: '&copy'
+         attribution: '&copy ...'
        }).addTo(this.map);
 
-    this.marker = new Marker([this.lat, this.lng], {draggable: true}).addTo(this.markers).addTo(this.map);
+    this.marker = new Marker([this.lat, this.lng], {icon: this.icon, draggable: true}).addTo(this.markers).addTo(this.map);
     this.marker.on('dragend', (event: any) => this.onMarkerDragEnd(event));
 
     this.initializeAutocomplete();
@@ -146,18 +154,17 @@ export class AppComponent implements OnInit {
         const { display_name } = object.properties;
         const [lng, lat] = object.geometry.coordinates;
     
-        const marker = L.marker([lat, lng], {
+        this.marker = L.marker([lat, lng], {
           title: display_name,
           draggable: true,
         });
     
-        marker.addTo(this.markers).addTo(this.map);
-        marker.bindPopup(display_name);
+        this.marker.addTo(this.markers).addTo(this.map);
+        this.marker.bindPopup(display_name);
         this.map.setView([lat, lng], 13);
     
-        marker.on('dragend', this.onMarkerDragEnd);
-    
-        this.reverseGeocoding(lat, lng);
+        //this.marker.on('dragend', this.onMarkerDragEnd);
+        this.marker.on('dragend', (event: any) => this.onMarkerDragEnd(event));
       },
       onSelectedItem: ({ index, element, object }: { index: number; element: any; object: any }) => {
         console.log("onSelectedItem:", index, element, object);
