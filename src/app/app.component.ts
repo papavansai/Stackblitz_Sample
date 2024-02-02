@@ -43,6 +43,8 @@ export class AppComponent implements OnInit {
     this.marker = new Marker([this.lat, this.lng], {draggable: true}).addTo(this.markers).addTo(this.map);
     this.marker.on('dragend', (event: any) => this.onMarkerDragEnd(event));
 
+    this.initializeAutocomplete();
+
   //   let map = L.map('map',{}).setView([17.4065, 78.4772], 13);
   //   var markers = L.layerGroup().addTo(map);
 
