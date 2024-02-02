@@ -1,7 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { LayerGroup, Map, Marker, TileLayer, } from 'leaflet';
+import * as L from 'leaflet';
 
-//import * as L from 'leaflet';
+declare const Autocomplete: any;
 
 @Component({
   selector: 'app-root',
@@ -100,6 +101,69 @@ export class AppComponent implements OnInit {
     (error) => {
       console.log("Error getting location: ", error.message);
     })
+  }
+
+  initializeAutocomplete(){
+    new Autocomplete("search", {
+      selectFirst: true,
+      howManyCharacters: 2,
+    
+      // onSearch
+      onSearch: ({ currentValue }: { currentValue: string }) => {
+        debugger
+        const api = `https://nominatim.openstreetmap.org/search?format=geojson&limit=5&city=${encodeURI(currentValue)}`;
+        return new Promise<any[]>((resolve) => {
+          fetch(api)
+            .then((response) => response.json())
+            .then((data) => {
+              console.log(data);
+              resolve(data.features);
+            })
+            .catch((error) => {
+              console.error(error);
+            });
+        });
+      },
+      onResults: ({ currentValue, matches, template }: { currentValue: any; matches: any; template: any }) => {
+        const regex = new RegExp(currentValue, "gi");
+    
+        return matches === 0
+          ? template
+          : matches
+              .map((element: any) => {
+                return `<li class='loupe'> <p>${element.properties.display_name.replace(regex, (str: string) => `<b>${str}</b>`)} </p></li>`;
+              })
+              .join("");
+      },
+      onSubmit: ({ object }: { object: any }) => {
+        this.map.eachLayer( (layer: any) => {
+          if (!!layer.toGeoJSON) {
+            this.map.removeLayer(layer);
+          }
+        });
+    
+        const { display_name } = object.properties;
+        const [lng, lat] = object.geometry.coordinates;
+    
+        const marker = L.marker([lat, lng], {
+          title: display_name,
+          draggable: true,
+        });
+    
+        marker.addTo(this.markers).addTo(this.map);
+        marker.bindPopup(display_name);
+        this.map.setView([lat, lng], 13);
+    
+        marker.on('dragend', this.onMarkerDragEnd);
+    
+        this.reverseGeocoding(lat, lng);
+      },
+      onSelectedItem: ({ index, element, object }: { index: number; element: any; object: any }) => {
+        console.log("onSelectedItem:", index, element, object);
+      },
+      noResults: ({ currentValue, template }: { currentValue: string; template:any }) => template(`<li>No results found: "${currentValue}"</li> `),
+    });
+    
   }
 
 }
