@@ -48,19 +48,11 @@ export class AppComponent implements OnInit {
          attribution: '&copy ...'
        }).addTo(this.map);
 
-    this.marker = new Marker([this.lat, this.lng], {icon: this.icon, draggable: true}).addTo(this.markers).addTo(this.map);
-    this.marker.on('dragend', (event: any) => this.onMarkerDragEnd(event));
+    //this.marker = new Marker([this.lat, this.lng], {icon: this.icon, draggable: true}).addTo(this.markers).addTo(this.map);
+    this.addMarker(this.lat, this.lng);
+    //this.marker.on('dragend', (event: any) => this.onMarkerDragEnd(event));
 
     this.initializeAutocomplete();
-
-  //   let map = L.map('map',{}).setView([17.4065, 78.4772], 13);
-  //   var markers = L.layerGroup().addTo(map);
-
-  //   L.tileLayer('http://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-  //     maxZoom: 19,
-  //     attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-  // }).addTo(map);
-  
   }
 
   onMarkerDragEnd(event: any){
