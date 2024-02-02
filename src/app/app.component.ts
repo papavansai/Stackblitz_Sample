@@ -112,7 +112,6 @@ export class AppComponent implements OnInit {
     
       // onSearch
       onSearch: ({ currentValue }: { currentValue: string }) => {
-        debugger
         const api = `https://nominatim.openstreetmap.org/search?format=geojson&limit=5&city=${encodeURI(currentValue)}`;
         return new Promise<any[]>((resolve) => {
           fetch(api)
