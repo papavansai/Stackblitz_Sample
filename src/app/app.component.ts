@@ -1,9 +1,17 @@
+import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
-import { LayerGroup, Map, Marker, TileLayer, } from 'leaflet';
+import { LayerGroup, Map, Marker, TileLayer, IconOptions } from 'leaflet';
 import * as L from 'leaflet';
+import 'leaflet.fullscreen';
 
 declare const Autocomplete: any;
-
+declare module 'leaflet' {
+  namespace Control {
+    class FullScreen extends Control {
+      constructor(options?: FullscreenOptions);
+    }
+  }
+}
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -12,13 +20,6 @@ declare const Autocomplete: any;
 export class AppComponent implements OnInit {
   
   title = 'osm_stackblitz';
-
-  // map: Map = new Map('map',{}); //Map('element')
-  // markers: LayerGroup= new LayerGroup();
-  // baseLayer: TileLayer = new TileLayer('http://tile.openstreetmap.org/{z}/{x}/{y}.png',{
-  //   maxZoom: 19,
-  //   attribution: '&copy'
-  // });
 
   map : Map | any;
   marker: Marker | any;
@@ -38,7 +39,14 @@ export class AppComponent implements OnInit {
      "https://unpkg.com/leaflet@1.5.1/dist/images/marker-shadow.png"
  });
 
-  constructor(){}
+ geoJsonData: any;
+ geoJsonLayer: any;
+_isgeoJson: boolean = false;
+  constructor(private http: HttpClient){
+    http.get('assets/test.geojson').subscribe((data)=> {
+      this.geoJsonData = data;
+    });
+  }
   
   ngOnInit(): void {
     this.map = new Map('map',{}).setView([this.lat, this.lng],13);
@@ -47,18 +55,20 @@ export class AppComponent implements OnInit {
          maxZoom: 19,
          attribution: '&copy ...'
        }).addTo(this.map);
-
-    //this.marker = new Marker([this.lat, this.lng], {icon: this.icon, draggable: true}).addTo(this.markers).addTo(this.map);
     this.addMarker(this.lat, this.lng);
-    //this.marker.on('dragend', (event: any) => this.onMarkerDragEnd(event));
-
     this.initializeAutocomplete();
+    this.addFullscreenControl();
+  }
+
+  private addFullscreenControl(): void {
+    // Add the fullscreen control to the map
+    const fullscreenControl = new L.Control.FullScreen();
+    this.map.addControl(fullscreenControl);
   }
 
   onMarkerDragEnd(event: any){
     var _marker = event.target;
     var position = _marker.getLatLng();
-
     this.reverseGeocoding(position.lat, position.lng);
   }
 
@@ -95,8 +105,6 @@ export class AppComponent implements OnInit {
       var cLat = position.coords.latitude;
       var cLng = position.coords.longitude;
 
-      //display
-
       this.addMarker(cLat, cLng);
       this.map.setView([cLat,cLng],13);
     },
@@ -104,6 +112,28 @@ export class AppComponent implements OnInit {
       console.log("Error getting location: ", error.message);
     })
   }
+
+  // toggleGeoJsonLayer() {
+  //   if (this.geoJsonLayer) {
+  //     if (this.map.hasLayer(this.geoJsonLayer)) {
+  //       this.map.removeLayer(this.geoJsonLayer);
+  //     } else {
+  //       this.geoJsonLayer.addTo(this.map);
+  //     }
+  //   }
+  // }
+
+  toggleGeoJSONLayer(){
+if (!this._isgeoJson){
+  this.geoJsonLayer = L.geoJson(this.geoJsonData);
+  this.geoJsonLayer.addTo(this.map);
+  this._isgeoJson = true;
+}
+else if (this._isgeoJson){
+  this.map.removeLayer(this.geoJsonLayer);
+  this._isgeoJson = false;
+}
+}
 
   initializeAutocomplete(){
     new Autocomplete("search", {
